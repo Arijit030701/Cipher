@@ -1,0 +1,45 @@
+name: Fullstack CI Pipeline
+
+# This triggers the action whenever you push to the main branch
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # You can match this to your local Node version
+
+      - name: Install Backend Dependencies
+        # Adjust 'cipher-backend' if your folder name is different
+        working-directory: ./cipher-backend 
+        run: npm install
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Frontend Dependencies
+        # Adjust 'assignment3' if your frontend folder name is different
+        working-directory: ./assignment3
+        run: npm install
+
+      - name: Build React App
+        working-directory: ./assignment3
+        run: npm run build
