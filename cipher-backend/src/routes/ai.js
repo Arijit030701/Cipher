@@ -1,7 +1,5 @@
 import express from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import fs from 'fs';
-import path from 'path';
 import { verifyToken } from '../middleware/authMiddleware.js'; // Adjust to your auth path
 
 const router = express.Router();
@@ -46,19 +44,52 @@ router.post('/generate-feature', verifyToken, async (req, res) => {
         responseText = responseText.replace(/,\s*([\]}])/g, '$1');
         const parsedData = JSON.parse(responseText);
 
-        // 2. Define target directory and file path (Adjust relative path to match your frontend folder)
-        const targetDir = path.resolve(process.cwd(), '../assignment3/src/components/generated');
-        const filePath = path.join(targetDir, `${componentName}.jsx`);
+        const token = process.env.GITHUB_TOKEN;
+        const owner = process.env.GITHUB_USERNAME;
+        const repo = process.env.GITHUB_REPO;
 
-        // 3. Auto-create directory if it doesn't exist
-        if (!fs.existsSync(targetDir)) {
-            fs.mkdirSync(targetDir, { recursive: true });
+        if (!token || !owner || !repo) {
+            return res.status(500).json({ message: "GitHub credentials are not configured in the environment variables." });
         }
 
-        // 4. Save the file directly to your frontend
-        fs.writeFileSync(filePath, parsedData.code, 'utf8');
+        // 3. Define target file path in your repository
+        const safeName = componentName.replace(/[^a-zA-Z0-9]/g, '');
+        const uniqueName = `${safeName}_${Date.now()}`;
+        const filePath = `assignment3/src/components/generated/${uniqueName}.jsx`;
 
-        res.json({ message: `✨ Component ${componentName}.jsx created and rendered live!` });
+        // 4. Convert generated code to Base64 (Required by GitHub API)
+        const base64Content = Buffer.from(parsedData.code).toString('base64');
+
+        const githubApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+
+        const githubResponse = await fetch(githubApiUrl, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: `Auto-generated component: ${safeName}.jsx via AI`,
+                content: base64Content,
+                branch: 'main' 
+            })
+        });
+
+        const githubData = await githubResponse.json();
+
+        if (!githubResponse.ok) {
+            console.error("GitHub API Error:", githubData);
+            return res.status(500).json({ 
+                message: "Failed to push to GitHub", 
+                error: githubData.message 
+            });
+        }
+
+        res.json({ 
+            message: `✨ Component ${safeName}.jsx committed to GitHub! Vercel is now rebuilding your site.`,
+            githubUrl: githubData.content?.html_url
+        });
 
     } catch (error) {
         console.error("AI Generation Error:", error);
