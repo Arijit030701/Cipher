@@ -24,8 +24,18 @@ export default function Register({setToken, switchToLogin}){
         }catch(err) {
             console.error("Axios caught an error:", err);
             const backendError = err.response?.data?.error;
+            
+            // This ensures we only pass a string to React, preventing the crash!
+            let errorMessage = "Network error. Is your backend running?";
+            if (typeof backendError === 'string') {
+                errorMessage = backendError;
+            } else if (backendError && backendError.message) {
+                errorMessage = backendError.message;
+            } else if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            }
 
-            setError(backendError || "Network error. Is your backend running?");
+            setError(errorMessage);
         }
     };
 
