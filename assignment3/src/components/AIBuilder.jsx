@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { API_BASE_URL } from './config/api';
+import axios from 'axios'; 
 
 export function AIBuilder({ token }) {
     const [prompt, setPrompt] = useState(''); // prompt: the text the user types describing the feature they want.
@@ -14,22 +15,25 @@ export function AIBuilder({ token }) {
         }
 
         setStatus('loading');
-        setMessage("AI is writing your code... Please wait.");
+        setMessage("AI is writing your code and pushing to GitHub...");
 
+        
         try {
             const response = await axios.post(
-                'http://localhost:3000/api/ai/generate-feature',
+                // Using the dynamic API_BASE_URL instead of hardcoded localhost
+                `${API_BASE_URL}/api/ai/generate-feature`,
                 { prompt, componentName },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             
             setStatus('success');
-            setMessage(response.data.message);
+            setMessage(`${response.data.message} Please wait ~60 seconds and refresh the page to see it!`);
             setPrompt('');
             setComponentName('');
         } catch (error) {
             setStatus('error');
-            setMessage("Failed to generate component. Check the backend server console.");
+            const errorMessage = error.response?.data?.message || "Failed to generate component. Check the backend server console.";
+            setMessage(`${errorMessage}`);
         }
     };
 
