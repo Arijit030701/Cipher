@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { API_BASE_URL } from './config/api';
 import axios from 'axios'; 
 
 export function AIBuilder({ token }) {
@@ -20,8 +19,8 @@ export function AIBuilder({ token }) {
         
         try {
             const response = await axios.post(
-                // Using the dynamic API_BASE_URL instead of hardcoded localhost
-                `${API_BASE_URL}/api/ai/generate-feature`,
+                // Use the relative path here, Axios handles the base URL!
+                `/api/ai/generate-feature`,
                 { prompt, componentName },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
