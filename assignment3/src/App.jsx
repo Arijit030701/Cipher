@@ -3,6 +3,10 @@ import { Dashboard } from './components/Dashboard';
 import Login from './components/Login';
 import Register from './components/Register';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import axios from 'axios';
+
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || '';
+
 function App() {
   const [token, setToken] = useLocalStorage('token', null);
   const [isLoginView, setIsLoginView] = useState(true);

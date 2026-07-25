@@ -30,7 +30,7 @@ export function FocusTimer({ tasks, token }) {
         if (durationMinutes < 1) return; // Don't save if less than a minute
 
         try {
-            await axios.post('http://localhost:3000/api/focus', {
+            await axios.post('/api/focus', {
                 duration: durationMinutes,
                 startTime: startTime.toISOString(),
                 endTime: endTime.toISOString()
@@ -47,7 +47,7 @@ export function FocusTimer({ tasks, token }) {
 
     const fetchAnalytics = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/focus/analytics', {
+            const response = await axios.get('/api/focus/analytics', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAnalytics(response.data);

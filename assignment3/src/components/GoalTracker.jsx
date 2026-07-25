@@ -17,7 +17,7 @@ export function GoalTracker({ goals, setGoals, token }) {
         e.preventDefault();
         if (!newGoalTitle.trim()) return;
         try{
-            const response = await axios.post('http://localhost:3000/api/goals', 
+            const response = await axios.post('/api/goals', 
                 { title: newGoalTitle.trim(), progress: 0 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -35,7 +35,7 @@ export function GoalTracker({ goals, setGoals, token }) {
             return;
         }
         try{
-            await axios.patch(`http://localhost:3000/api/goals/${goalId}`,
+            await axios.patch(`/api/goals/${goalId}`,
                 { title: editGoalText.trim() },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -48,7 +48,7 @@ export function GoalTracker({ goals, setGoals, token }) {
 
     const handleUpdateProgress = async (goalId, newProgress) => {
         try {
-            await axios.patch(`http://localhost:3000/api/goals/${goalId}`,
+            await axios.patch(`/api/goals/${goalId}`,
                 { progress: newProgress },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

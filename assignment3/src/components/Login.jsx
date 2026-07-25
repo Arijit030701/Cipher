@@ -11,7 +11,7 @@ export default function Login({setToken, switchToRegister}){
         setError(null);
 
         try {
-            const response = await axios.post('http://localhost:3000/api/auth/login', {
+            const response = await axios.post('/api/auth/login', {
                 email,
                 password
             });

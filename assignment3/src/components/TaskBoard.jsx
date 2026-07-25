@@ -68,7 +68,7 @@ export function TaskBoard({ tasks, setTasks, token }) {
         if(newTaskTitle.trim() === '') return;
         
         try{
-            const response = await axios.post('http://localhost:3000/api/tasks', 
+            const response = await axios.post('/api/tasks', 
                 { title: newTaskTitle.trim() },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -86,7 +86,7 @@ export function TaskBoard({ tasks, setTasks, token }) {
     const handleDeleteTask = async (taskId) => {
 
         try{
-            await axios.delete(`http://localhost:3000/api/tasks/${taskId}`, {
+            await axios.delete(`/api/tasks/${taskId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setTasks(tasks.filter(task => task.id !== taskId));
@@ -99,7 +99,7 @@ export function TaskBoard({ tasks, setTasks, token }) {
         const newStatus = !task.isCompleted;
 
         try{
-            await axios.patch(`http://localhost:3000/api/tasks/${task.id}`, 
+            await axios.patch(`/api/tasks/${task.id}`, 
                 { isCompleted: newStatus },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -148,7 +148,7 @@ export function TaskBoard({ tasks, setTasks, token }) {
         }
         try {
             // 1. Tell PostgreSQL the new title
-            await axios.patch(`http://localhost:3000/api/tasks/${taskId}`, 
+            await axios.patch(`/api/tasks/${taskId}`, 
                 { title: editTitleText.trim() },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -177,7 +177,7 @@ export function TaskBoard({ tasks, setTasks, token }) {
 
         try {
             // 1. Send the data to your PostgreSQL Database
-            const response = await axios.post(`http://localhost:3000/api/tasks/${taskId}/subtasks`, 
+            const response = await axios.post(`/api/tasks/${taskId}/subtasks`, 
                 { title: titleText },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -204,7 +204,7 @@ export function TaskBoard({ tasks, setTasks, token }) {
 
         try {
             // 1. Tell the backend to update it
-            await axios.patch(`http://localhost:3000/api/tasks/subtasks/${subtaskId}`, 
+            await axios.patch(`/api/tasks/subtasks/${subtaskId}`, 
                 { isCompleted: newStatus },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -226,7 +226,7 @@ export function TaskBoard({ tasks, setTasks, token }) {
     const deleteSubtask = async (taskId, subtaskId) => {
         try {
              // 1. Tell the backend to delete it
-             await axios.delete(`http://localhost:3000/api/tasks/subtasks/${subtaskId}`, {
+             await axios.delete(`/api/tasks/subtasks/${subtaskId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

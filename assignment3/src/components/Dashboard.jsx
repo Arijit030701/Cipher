@@ -24,12 +24,12 @@ export function Dashboard({ token, setToken }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/tasks', {
+                const response = await axios.get('/api/tasks', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setTasks(response.data);
 
-                const goalsRes = await axios.get('http://localhost:3000/api/goals', {
+                const goalsRes = await axios.get('/api/goals', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setGoals(goalsRes.data);
