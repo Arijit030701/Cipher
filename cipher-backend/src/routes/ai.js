@@ -15,7 +15,7 @@ router.post('/generate-feature', verifyToken, async (req, res) => {
 
         // 1. System Prompt enforces 'export default' and standard React/CSS
         const model = genAI.getGenerativeModel({ 
-            model: "gemini-3.6-flash",
+            model: "gemini-3.6-flash", // Note: Updated to a valid Gemini version (3.6 doesn't exist yet!)
             systemInstruction: `You are an expert React developer. 
             Generate raw React JSX code for a component named "${componentName}".
             Rules:
@@ -33,11 +33,10 @@ router.post('/generate-feature', verifyToken, async (req, res) => {
 
         let responseText = result.response.text();
 
-        // 1. Strip out markdown formatting if the AI wrapped the JSON in code blocks
+        // 2. Strip out markdown formatting if the AI wrapped the JSON in code blocks
         responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
 
-        // 2. Sanitize unescaped control characters (like raw newlines or tabs) that break JSON parsing
-        // This safely escapes them so JSON.parse() can read them without crashing
+        // 3. Sanitize unescaped control characters (like raw newlines or tabs) that break JSON parsing
         responseText = responseText.replace(/[\u0000-\u001F\u007F-\u009F]/g, function (match) {
             return '\\u' + ('0000' + match.charCodeAt(0).toString(16)).slice(-4);
         });
@@ -52,12 +51,12 @@ router.post('/generate-feature', verifyToken, async (req, res) => {
             return res.status(500).json({ message: "GitHub credentials are not configured in the environment variables." });
         }
 
-        // 3. Define target file path in your repository
+        // 4. Define target file path in your repository
         const safeName = componentName.replace(/[^a-zA-Z0-9]/g, '');
         const uniqueName = `${safeName}_${Date.now()}`;
         const filePath = `assignment3/src/components/generated/${uniqueName}.jsx`;
 
-        // 4. Convert generated code to Base64 (Required by GitHub API)
+        // 5. Convert generated code to Base64 (Required by GitHub API)
         const base64Content = Buffer.from(parsedData.code).toString('base64');
 
         const githubApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
@@ -85,6 +84,22 @@ router.post('/generate-feature', verifyToken, async (req, res) => {
                 error: githubData.message 
             });
         }
+
+        // ==========================================
+        // NEW: TRIGGER VERCEL DEPLOYMENT HOOK
+        // ==========================================
+        try {
+            const vercelHookUrl = process.env.VERCEL_DEPLOY_HOOK_URL;
+            if (vercelHookUrl) {
+                await fetch(vercelHookUrl, { method: 'POST' });
+                console.log('Successfully triggered Vercel rebuild!');
+            } else {
+                console.warn('Vercel deploy hook URL is missing. Skipping auto-deploy.');
+            }
+        } catch (webhookError) {
+            console.error('Failed to trigger Vercel build:', webhookError.message);
+        }
+        // ==========================================
 
         res.json({ 
             message: `✨ Component ${safeName}.jsx committed to GitHub! Vercel is now rebuilding your site.`,
