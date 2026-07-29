@@ -40,13 +40,15 @@ export const validate = (schema) => (req, res, next) => {
         schema.parse(req.body); 
         next(); // If it passes, move to the route!
     } catch (error) {
-        // If it fails, send a 400 Bad Request with exactly what went wrong
-        const details = error.errors 
+        // Safely extract the messages
+        const safeDetails = error.errors 
             ? error.errors.map(err => err.message) 
-            : [error.message];
+            : [error.message || "An unknown validation error occurred"];
+            
+        // Send the safely extracted messages
         res.status(400).json({ 
             error: "Validation failed", 
-            details: error.errors.map(err => err.message) 
+            details: safeDetails 
         });
     }
 };
