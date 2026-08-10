@@ -8,7 +8,6 @@ import { FocusTimer } from './FocusTimer';
 import { MoodBoard } from './MoodBoard';
 import { Navbar } from './Navbar';
 import { AIBuilder } from './AIBuilder';
-import MagicButton from './MagicButton';
 import { DynamicRenderer } from './DynamicRenderer';
 
 // 1. Accept setToken as a prop so we can pass it to the Navbar
