@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios'; 
-
+import { API_BASE_URL } from "../config/api";
 export function AIBuilder({ token }) {
     const [prompt, setPrompt] = useState(''); // prompt: the text the user types describing the feature they want.
     const [componentName, setComponentName] = useState('');// componentName: the name for the generated file/component.
