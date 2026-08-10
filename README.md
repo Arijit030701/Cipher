@@ -74,12 +74,12 @@ JWT_SECRET=your_secure_jwt_secret
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/yourusername/cipher.git
+    git clone https://github.com/Arijit030701/Cipher.git
     cd cipher
     ```
 2.  **Start the Backend (Express):**
     ```bash
-    cd backend
+    cd cipher-backend
     npm install
     npm start
     ```
