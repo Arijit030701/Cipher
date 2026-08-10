@@ -13,7 +13,7 @@ export function AIBuilder({ token }) {
         }
 
         setStatus('loading');
-        setMessage("AI is writing your code and pushing to GitHub...");
+        setMessage("AI is generating component, after green remark wait for 1 minute and refresh the page to see the component...");
 
         
         try {
