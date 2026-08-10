@@ -53,8 +53,7 @@ export function Dashboard({ token, setToken }) {
                 <Navbar setToken={setToken} />
 
                 {activeSection === 'tasks' && (
-                    <>
-                    <MagicButton />  
+                    <> 
                     <TaskBoard tasks={tasks} setTasks={setTasks} token={token} />
                     </>
                 )}
