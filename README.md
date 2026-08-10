@@ -15,7 +15,7 @@ Cipher is built using a modern full-stack JavaScript environment, prioritizing s
 
 ### Frontend
 *   **Framework:** React (deployed via Vercel)
-*   **Styling:** Modern CSS with glassmorphism UI elements
+*   **Styling:** Used simple css methodology for styling 
 *   **State Management:** Custom React hooks for persistent dashboard rendering
 *   **Dynamic UI:** Custom `DynamicRenderer` for injecting compiled AI-generated components on the fly
 
@@ -85,7 +85,7 @@ JWT_SECRET=your_secure_jwt_secret
     ```
 3.  **Start the Frontend (Vite/React):**
     ```bash
-    cd frontend
+    cd assignment3
     npm install
     npm run dev
     ```
