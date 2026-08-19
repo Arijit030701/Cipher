@@ -12,64 +12,75 @@ https://cipher-two-tawny.vercel.app/
 ## State Architecture
 
 ```mermaid
-stateDiagram-v2
-    [*] --> ClientIdle
+flowchart RL
+    subgraph Client [Client Side / Frontend - Vercel]
+        direction TB
+        UI[React User Interface]
+        State[Local Storage & Hooks]
+        
+        subgraph Components [React Components]
+            CRUD[TaskBoard, FocusTimer, Goals]
+            AIInput[AI Builder Interface]
+            DR[DynamicRenderer]
+        end
+        
+        UI --> State
+        UI --> Components
+    end
 
-    ClientIdle --> AuthCheck: User Action
+    subgraph Server [Server Side / Backend - Render]
+        direction TB
+        API[Express.js API Gateway]
+        
+        subgraph Middlewares [Security & Validation]
+            JWT[verifyToken / JWT Auth]
+            Zod[Zod Schema Validation]
+        end
+        
+        subgraph Controllers [Business Logic]
+            DataCtrl[CRUD Controllers]
+            AICtrl[AI Generation Pipeline]
+        end
+        
+        ORM[Prisma ORM]
+        
+        API --> JWT
+        JWT --> Zod
+        Zod --> DataCtrl
+        Zod --> AICtrl
+        DataCtrl <--> ORM
+    end
 
-    state AuthCheck {
-        [*] --> VerifyingToken
-        VerifyingToken --> TokenValid
-        VerifyingToken --> TokenInvalid
-    }
+    subgraph Database [Database Tier]
+        DB[(PostgreSQL Database)]
+    end
 
-    AuthCheck --> ClientIdle: TokenInvalid (401 Unauthorized)
+    subgraph External [External Integrations & CI/CD]
+        Gemini[Google Gemini 1.5 Flash]
+        GitHub[GitHub REST API]
+        VercelHook[Vercel Deploy Webhook]
+        VercelBuild[Vercel Build Environment]
+    end
 
-    state "Request Routing" as Routing {
-        [*] --> RequestReceived
-        RequestReceived --> SchemaValidation: Zod Validation
-    }
+    %% Client to Server Connections
+    CRUD -- "Standard HTTP Requests" --> API
+    AIInput -- "HTTP POST (Prompt + Token)" --> API
 
-    AuthCheck --> Routing: TokenValid
+    %% Database Connection
+    ORM <--> DB
 
-    Routing --> CRUDFlow: Standard HTTP Request
-    Routing --> AIFlow: AI Prompt Request
-    SchemaValidation --> ClientIdle: Validation Failed (400)
-
-    state CRUDFlow {
-        [*] --> ProcessingRequest
-        ProcessingRequest --> QueryingDB: Prisma ORM
-        QueryingDB --> ResponseReady
-    }
-
-    CRUDFlow --> ClientIdle: JSON Response Returned
-
-    state AIFlow {
-        [*] --> SendingPrompt
-        SendingPrompt --> AwaitingGemini: POST to Gemini 1.5 Flash
-        AwaitingGemini --> ParsingPayload: JSON Payload Returned
-        ParsingPayload --> GeneratingComponent: Valid .jsx Extracted
-        ParsingPayload --> AIFlowFailed: Malformed/Invalid Response
-
-        GeneratingComponent --> CommittingToGitHub: Base64 Encode + Commit
-
-        state "CI/CD Pipeline" as CICD {
-            [*] --> WebhookTriggered
-            WebhookTriggered --> BuildQueued: Vercel Deploy Webhook
-            BuildQueued --> Building: Vercel Build Env
-            Building --> DeploySuccess
-            Building --> DeployFailed
-        }
-
-        CommittingToGitHub --> CICD: GitHub Webhook Fires
-        CICD --> ComponentInjected: DeploySuccess
-        CICD --> AIFlowFailed: DeployFailed
-    }
-
-    ComponentInjected --> ClientIdle: DynamicRenderer Updates UI
-    AIFlowFailed --> ClientIdle: Error Shown to User
+    %% AI Pipeline Flow
+    AICtrl -- "1. Sends System Prompt" --> Gemini
+    Gemini -- "2. Returns JSON Payload" --> AICtrl
+    AICtrl -- "3. Commits Base64 .jsx" --> GitHub
+    AICtrl -- "4. Triggers Rebuild POST" --> VercelHook
+    
+    %% CI/CD Loop
+    GitHub -- "Webhook: Code Updated" --> VercelBuild
+    VercelHook -- "Forces Immediate Build" --> VercelBuild
+    VercelBuild -- "Deploys Updated App" --> Client
+    VercelBuild -. "Injects compiled component" .-> DR
 ```
-
 ---
 
 
