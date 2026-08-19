@@ -202,7 +202,7 @@ Cipher is engineered to handle edge cases gracefully:
 *   **UI Resilience:** The frontend HTTP requests utilize `try...catch` blocks to capture backend errors, displaying user-friendly error boundaries rather than breaking the core dashboard layout.
 
 ## State Diagram
-
+```
 flowchart TB
     subgraph Client [Client Side / Frontend - Vercel]
         direction TB
@@ -271,3 +271,4 @@ flowchart TB
     VercelHook -- "Forces Immediate Build" --> VercelBuild
     VercelBuild -- "Deploys Updated App" --> Client
     VercelBuild -. "Injects compiled component" .-> DR
+```
